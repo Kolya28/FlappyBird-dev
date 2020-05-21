@@ -154,6 +154,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="FlappyBird.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="IPipeManager.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -165,6 +167,8 @@
     <ClCompile Include="Test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="IPipeManager.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="State.h" />

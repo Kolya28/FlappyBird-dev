@@ -7,6 +7,9 @@
 #ifndef PCH_H
 #define PCH_H
 
+#include <iostream>
+#include <SFML/Graphics.hpp>
+
 // Добавьте сюда заголовочные файлы для предварительной компиляции
 
 #endif //PCH_H
