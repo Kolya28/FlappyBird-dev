@@ -1,40 +1,82 @@
 #include "pch.h"
 #include "StatesManager.h"
 
-void StatesManager::init(std::string dir, int h, int v, const std::string& title, bool fullscreen)
+StatesManager::StatesManager()
+{
+	State::engine = this;
+	State::assets = &assets;
+}
+
+StatesManager::~StatesManager()
+{
+}
+
+void StatesManager::init(const fs::path& dir, const std::string& title)
 {
 	this->dir = dir;
-	running = true;
-
-	hwnd = GetDesktopWindow();
-	hdc = GetDC(hwnd);
-
-	if (h == 0)
+	this->assetsDir = dir / "Assets";
+	
+	try
 	{
-		this->h = GetDeviceCaps(hdc, HORZRES);
-		this->v = GetDeviceCaps(hdc, VERTRES);
+		ws.startup();
 	}
-	else
+	catch (std::exception& ex)
 	{
-		this->h = h;
-		this->v = v;
+		std::cerr << ex.what() << std::endl;
+		return;
 	}
 
-	window.create(sf::VideoMode(this->h, this->v), title,
-		(fullscreen ?
+
+	try
+	{
+		myPlayer.readFromFile(dir / "player.json");
+		settings.loadFromFile(dir / "settings.json");
+		ws.config.loadFromFile(dir / "network.json");
+	}
+	catch(std::exception& ex)
+	{
+		std::cerr << ex.what() << std::endl;
+	}
+
+	window.create(sf::VideoMode(settings.width, settings.height), title,
+		(settings.fullscreen ?
 			sf::Style::Fullscreen :
 			sf::Style::Default));
 
+	window.setVerticalSyncEnabled(settings.vsync);
+	window.setKeyRepeatEnabled(settings.key_repeat);
+
 	defaultView = window.getDefaultView();
 
-	window.setVerticalSyncEnabled(true);
-	window.setKeyRepeatEnabled(false);
+	running = true;
+
+
+	auto p = new std::thread([]()
+		{
+			MSG msg;
+			while (GetMessage(&msg, (HWND)NULL, 0, 0)) {
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+		});
 }
 
 void StatesManager::cleanup()
 {
 	quit();
 	window.close();
+
+	try
+	{
+		assets.cleanup();
+		ws.cleanup();
+	}
+	catch (std::exception& ex)
+	{
+		std::cerr << ex.what() << std::endl;
+		return;
+	}
+
 }
 
 void StatesManager::handleEvent(sf::Event& ev)
@@ -50,14 +92,9 @@ void StatesManager::handleEvent(sf::Event& ev)
 		defaultView.setCenter(static_cast<sf::Vector2f>(window.getSize()) / 2.f);
 		defaultView.setSize(static_cast<sf::Vector2f>(window.getSize()));
 		window.setView(defaultView);
-	}
 
-	if (userScaleChanged)
-	{
-		sf::Event t;
-		t.type = sf::Event::Resized;
-		handleEvent(t);
-		userScaleChanged = false;
+		if (settings.scale != 0.f)
+			return;
 	}
 
 	for (auto& s : states)
@@ -85,7 +122,6 @@ void StatesManager::draw()
 
 void StatesManager::pushState(State* newState)
 {
-	newState->setEngine(this);
 	newState->init();
 	states.push_back(newState);
 }
@@ -98,6 +134,8 @@ void StatesManager::popState()
 
 	if (states.empty())
 		running = false;
+	else
+		states.back()->resume();
 }
 
 void StatesManager::changeState(State* newState)
@@ -119,10 +157,3 @@ bool StatesManager::isRunning() const
 {
 	return running && window.isOpen();
 }
-
-void StatesManager::setUserScale(float scale)
-{
-	userScale = scale;
-	userScaleChanged = true;
-}
-

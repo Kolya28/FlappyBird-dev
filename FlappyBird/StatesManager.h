@@ -1,20 +1,20 @@
 #pragma once
 #include "pch.h"
 
-#include<SFML/Graphics.hpp>
-#include <Windows.h>
-#include <filesystem>
-
+#include "AssetsManager.h"
 #include "State.h"
-#include <vector>
+#include "Settings.h"
+#include "MyPlayer.h"
+#include "Network.h"
 
-namespace fs = std::filesystem;
 class State;
 
 class StatesManager
 {
 public:
-	void init(std::string dir, int h, int v, const std::string &title, bool fullscreen);
+	StatesManager();
+	~StatesManager();
+	void init(const fs::path& dir, const std::string &title);
 	void cleanup();
 
 	void handleEvent(sf::Event &ev);
@@ -29,22 +29,32 @@ public:
 
 	bool isRunning() const;
 
-	float getUserScale() { return userScale; }
-	bool isUserScaleChanged() { return userScaleChanged; }
-	void setUserScale(float scale);
+	//settings
+	void savePlayer() { myPlayer.saveToFile(dir / "player.json"); }
+
+	float getScale() { return settings.scale; }
+	void setScale(float scale) { settings.scale = scale; }
+
+	int getMaxFps() { return settings.max_fps; }
+
+
+	
 
 	sf::RenderWindow window;
-	std::string dir;
+	fs::path dir, assetsDir;
+
+	AssetsManager assets;
+	Network ws;
+	MyPlayer myPlayer;
 
 private:
-	bool userScaleChanged = false;
-	float userScale = 1.f;
-	bool running;
-	int h, v; //screen
-	sf::View defaultView;
-	HWND hwnd;
-	HDC  hdc;
 	
+	
+	Settings settings;
+
+	bool running;
+
+	sf::View defaultView;
 	std::vector<State*> states;
 };
 

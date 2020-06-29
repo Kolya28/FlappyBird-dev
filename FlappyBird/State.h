@@ -1,15 +1,16 @@
 #pragma once
 #include "pch.h"
-
-#include<SFML/Graphics.hpp>
 #include "StatesManager.h"
 
 class StatesManager;
 
 class State
 {
+	friend StatesManager;
 public:
-	void setEngine(StatesManager* engine) { this->engine = engine; };
+	State() {}
+	virtual ~State() {}
+	
 	virtual void init() = 0;
 	virtual void cleanup() = 0;
 	
@@ -17,16 +18,24 @@ public:
 	virtual void update(float dt) = 0;
 	virtual void draw() = 0;
 
-	virtual void pause() = 0;
-	virtual void resume() = 0;
+	virtual void pause()
+	{
+		isVisible = false;
+		isStopped = true;
+	}
+
+	virtual void resume()
+	{
+		isVisible = true;
+		isStopped = false;
+	}
 
 	bool isVisible = true;
 	bool isStopped = false;
 
-	virtual ~State() {};
 
 protected:
-
-	StatesManager* engine;
+	static StatesManager* engine;
+	static AssetsManager* assets;
 };
 

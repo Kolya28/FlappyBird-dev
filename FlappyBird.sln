@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.29920.165
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlappyBird", "FlappyBird\FlappyBird.vcxproj", "{5D5F34C7-7390-44D0-AA66-91F0B70282A8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server", "Server\Server.vcxproj", "{6F3AE9AE-6830-4321-B450-837D3835DDFF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{5D5F34C7-7390-44D0-AA66-91F0B70282A8}.Release|x64.Build.0 = Release|x64
 		{5D5F34C7-7390-44D0-AA66-91F0B70282A8}.Release|x86.ActiveCfg = Release|Win32
 		{5D5F34C7-7390-44D0-AA66-91F0B70282A8}.Release|x86.Build.0 = Release|Win32
+		{6F3AE9AE-6830-4321-B450-837D3835DDFF}.Debug|x64.ActiveCfg = Debug|x64
+		{6F3AE9AE-6830-4321-B450-837D3835DDFF}.Debug|x64.Build.0 = Debug|x64
+		{6F3AE9AE-6830-4321-B450-837D3835DDFF}.Debug|x86.ActiveCfg = Debug|Win32
+		{6F3AE9AE-6830-4321-B450-837D3835DDFF}.Debug|x86.Build.0 = Debug|Win32
+		{6F3AE9AE-6830-4321-B450-837D3835DDFF}.Release|x64.ActiveCfg = Release|x64
+		{6F3AE9AE-6830-4321-B450-837D3835DDFF}.Release|x64.Build.0 = Release|x64
+		{6F3AE9AE-6830-4321-B450-837D3835DDFF}.Release|x86.ActiveCfg = Release|Win32
+		{6F3AE9AE-6830-4321-B450-837D3835DDFF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

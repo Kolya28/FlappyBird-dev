@@ -1,0 +1,9 @@
+{
+    "fullscreen": false,
+    "vsync": true,
+    "scale": null,
+    "max_fps": null,
+    "height": 500,
+    "width": 500,
+    "key_repeat": false
+}

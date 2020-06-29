@@ -14,62 +14,68 @@ public:
 
 	void draw(sf::RenderTarget& target)
 	{
+		float h = target.getView().getSize().y;
 
+		pipe_bottom->setPosition(pos, h - height * *scale);
+		pipe_top->setPosition(pos, h - (height + space) * *scale);
+
+		target.draw(*pipe_bottom);
+		target.draw(*pipe_top);
 	}
 
 	float height, pos;
-	static sf::Sprite* pipe, pipe_top, pipe_bottom;
+	static sf::Sprite* pipe, * pipe_top, * pipe_bottom;
+	static float space;
+	static float* scale;
 };
+
 
 class IPipeManager
 {
 public:
+	IPipeManager();
+	~IPipeManager();
+
+	void loadTextures();
+	void rescale();
+
+	void init(float width, float space, float* scale);
+
+
 	void setPipeWidth(float width) { pipe_width = width; };
 	virtual void addPipe(float height, float pos) = 0;
 	void popFront() { pipes.pop_front(); };
 
 
-	void checkCollision(sf::CircleShape player_hitbox)
-	{
-		float pos = player_hitbox.getPosition().x - pipe_width - player_hitbox.getRadius();
+	bool checkCollision(sf::CircleShape player_hitbox);
 
-		auto pipe = std::lower_bound(pipes.begin(), pipes.end(),
-			Pipe(0, pos), pipe_pred);
-
-		sf::FloatRect pipe_hitbox_top(0.f,-1000000000.f, pipe_width, 0.f);
-		sf::FloatRect pipe_hitbox_bottom(0.f, 0.f, pipe_width, 1000000000.f);
-
-		for (auto it = pipe;
-			it->pos >= player_hitbox.getPosition().x + player_hitbox.getRadius()
-			&& it != pipes.end();
-			++it)
-		{
-
-		}
-	}
-
-	void drawPipes(float relativeTo, sf::RenderTarget& target)
-	{
-		auto pipe = std::lower_bound(pipes.begin(), pipes.end(),
-			Pipe(0, relativeTo), pipe_pred);
-
-		if (pipe == pipes.end())
-			return;
-
-		for (auto it = pipe;
-			it->pos <= relativeTo + target.getSize().x && it!=pipes.end();
-			++it)
-		{
-			it->draw(target);
-		}
-	}
+	void drawPipes(float relativeTo, sf::RenderTarget& target);
 
 private:
+	float* scale = nullptr;
 	float pipe_width = 0;
 	std::deque<Pipe> pipes;
 	std::function<bool(const Pipe& a, const Pipe& b)> pipe_pred = [](const Pipe& a, const Pipe& b)
 	{
 		return a.pos < b.pos;
 	};
+};
+
+class PipeManagerSinglePlayer : public IPipeManager
+{
+public:
+	void addPipe(float pos, float height) override
+	{
+
+	}
+};
+
+class PipeManagerMultiPlayer : public IPipeManager
+{
+public:
+	void addPipe(float pos, float height) override
+	{
+
+	}
 };
 

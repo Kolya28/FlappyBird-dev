@@ -1,58 +1,70 @@
 #include "pch.h"
-#include "MainMenu.h"
+#include "Menu.h"
 
-MainMenu::MainMenu()
+Menu::Menu()
+{
+	
+}
+
+Menu::~Menu()
 {
 }
 
-MainMenu::~MainMenu()
+void Menu::init()
 {
-}
-
-void MainMenu::init()
-{
-	menu_dir = engine->dir + "\\Assets\\States\\MainMenu\\";
+	dir = engine->assetsDir / "States" / "Menu";
 
 	c_buttonA = c_buttonP = c_buttonR = sf::Color::Color(200, 200, 200, 255);
-	font.loadFromFile(menu_dir+"font.ttf");
-	text.setFont(font);
+	text.setFont(
+		engine->assets.load<sf::Font>("menu/font", dir / "font.ttf")
+		);
 
-	t_buttonA.loadFromFile(menu_dir + "button_hover.png");
-	t_buttonP.loadFromFile(menu_dir + "button_pressed.png");
-	t_buttonR.loadFromFile(menu_dir + "button_released.png");
+	assets->load<sf::Texture>("menu/button_active", dir/"button_hover.png");
+	assets->load<sf::Texture>("menu/button_pressed", dir / "button_pressed.png");
+	assets->load<sf::Texture>("menu/button_released", dir / "button_released.png");
+	/*t_buttonA.loadFromFile(dir + "\\button_hover.png");
+	t_buttonP.loadFromFile(dir + "\\button_pressed.png");
+	t_buttonR.loadFromFile(dir + "\\button_released.png");*/
 	
-	s_button.setTexture(t_buttonR);
-
-	
+	s_button.setTexture(
+		assets->get<sf::Texture>("menu/button_released")
+			);
 
 	spacing = 20.f;
 	grid_centre = sf::Vector2f(0.5f, 0.5f);
 
 
 	placeButtons();
+	n = buttons.size();
+
 	rescale();
 }
 
-void MainMenu::placeButtons()
+void Menu::cleanup()
 {
-	button.emplace_back("Play", [&]() {std::cout << "Play\n"; return false; });
-	button.emplace_back("Online", [&]() {std::cout << "Online\n"; return false; });
-	button.emplace_back("Settings", [&]() {std::cout << "Settings\n"; return false; });
-	button.emplace_back("Exit", [&]() {engine->popState(); return true; });
-	n = button.size();
+	assets->clean("menu/font");
+	assets->clean("menu/button_active");
+	assets->clean("menu/button_pressed");
+	assets->clean("menu/button_released");
 }
 
-void MainMenu::rescale()
+void Menu::rescale()
 {
 	sf::Vector2f view = static_cast<sf::Vector2f>(engine->window.getSize());
 	
-	float SizeY = t_buttonP.getSize().y * n + spacing * (n - 1);
+	float SizeY = s_button.getTexture()->getSize().y * n
+		+ spacing * (n - 1);
 
-	scale = std::min(std::round(view.y / (SizeY + 200.f / engine->getUserScale())),
-		std::round(view.x / (t_buttonA.getSize().x + 100.f / engine->getUserScale())));
-	
-	if (scale == 0.f)
-		scale = 1.f;
+	if (engine->getScale() != 0)
+		scale = engine->getScale();
+	else
+	{
+		scale = std::min(std::round(view.y / (SizeY + 200.f)),
+			std::round(view.x / (s_button.getTexture()->getSize().x + 100.f)));
+
+		if (scale == 0.f)
+			scale = 1.f;
+	}
 
 	s_button.setScale(scale, scale);
 	text.setCharacterSize(10*scale);
@@ -62,17 +74,11 @@ void MainMenu::rescale()
 
 	grid_pos.y -= SizeY*scale / 2.f;
 	grid_pos.x -= s_button.getGlobalBounds().width / 2.f;
-
-	/*std::cout << engine->window.getSize().x << 'x'
-		<< engine->window.getSize().y << std::endl
-		<< grid_pos.x << 'x' << grid_pos.y << "\n\n";*/
 }
 
-void MainMenu::cleanup()
-{
-}
 
-void MainMenu::handleEvent(sf::Event& ev)
+
+void Menu::handleEvent(sf::Event& ev)
 {
 	switch (ev.type)
 	{
@@ -120,9 +126,9 @@ void MainMenu::handleEvent(sf::Event& ev)
 				
 				if (pressed && active_pos != -1)
 				{
-					if (button[active_pos].onPressed())
-						return;
 					pressed = false;
+
+					buttons[active_pos].onClick();	
 				}
 				break;
 			}
@@ -141,7 +147,7 @@ void MainMenu::handleEvent(sf::Event& ev)
 
 }
 
-void MainMenu::update(float dt)
+void Menu::update(float dt)
 {
 	if (!enableMouse)
 		return;
@@ -164,7 +170,7 @@ void MainMenu::update(float dt)
 	}
 }
 
-void MainMenu::draw()
+void Menu::draw()
 {
 	s_button.setPosition(grid_pos);
 
@@ -172,17 +178,17 @@ void MainMenu::draw()
 	{
 		if (i == active_pos)
 			if (!pressed)
-				s_button.setTexture(t_buttonA),
+				s_button.setTexture(assets->get<sf::Texture>("menu/button_active")),
 				text.setFillColor(c_buttonA);
 			else
-				s_button.setTexture(t_buttonP),
+				s_button.setTexture(assets->get<sf::Texture>("menu/button_pressed")),
 				text.setFillColor(c_buttonP);
 		else
-			s_button.setTexture(t_buttonR),
+			s_button.setTexture(assets->get<sf::Texture>("menu/button_released")),
 			text.setFillColor(c_buttonR);
 
 
-		text.setString(button[i].str);
+		text.setString(buttons[i].str);
 
 		text.setPosition(s_button.getPosition() +
 			sf::Vector2f(s_button.getGlobalBounds().width, s_button.getGlobalBounds().height) / 2.f -
@@ -196,13 +202,3 @@ void MainMenu::draw()
 		s_button.move(0, s_button.getGlobalBounds().height + spacing * scale);
 	}
 }
-
-void MainMenu::pause()
-{
-}
-
-void MainMenu::resume()
-{
-}
-
-

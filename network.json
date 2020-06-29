@@ -1,0 +1,7 @@
+{
+  "hostnames": [
+    "london.mykeenetic.ru"
+  ],
+  "tcp_port": 50385,
+  "udp_port": 50386
+}

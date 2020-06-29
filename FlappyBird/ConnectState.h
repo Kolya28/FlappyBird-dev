@@ -1,13 +1,13 @@
 #pragma once
-#include "pch.h"
 #include "State.h"
-#include "IPipeManager.h"
+#include "Game.h"
 
-class Game : public State
+class ConnectState :
+	public State
 {
 public:
-	Game(bool online);
-	~Game();
+	ConnectState();
+	~ConnectState();
 
 	void init() override;
 	void cleanup() override;
@@ -17,11 +17,5 @@ public:
 	void draw() override;
 
 private:
-	//draw
-	void drawUI();
-
-	IPipeManager* pipeManager;
-	std::wstring str;
-
 };
 
